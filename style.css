@@ -10,6 +10,8 @@
     --sidebar-hover-grey: #c7c2c2;
     --icons-color: 	gold;
     --move-history-text: rgb(84, 83, 83);
+    --scrollbar-color: rgb(88, 87, 87);
+    --scrollbar-hover: rgb(137, 137, 137);
 }
 
 * {
@@ -169,7 +171,8 @@ body {
 .move-history-container {
     background-color: var(--sidebar-color);
     color: var(--icons-color);
-    display: block;
+    display: flex;
+    flex-direction: column;
     height: 85vh;
     width: 25vw;
     position: absolute;
@@ -189,4 +192,65 @@ body {
 .move-history-text span {
     position: relative;
     left: 30%;
+}
+
+.moves-list {
+    font-family: 'Pacifico', cursive;
+    position: absolute;
+    top: 7%;
+    left: 7%;
+    height: 77vh;
+    width: 22vw;
+    overflow: auto;
+}
+
+/* Move history new appendages */
+.move {
+    color: var(--sidebar-hover-grey);
+    font-size: 25px;
+    height: 45px;
+    position: relative;
+    width: 100%;
+    display: flex;
+}
+
+.white {
+    line-height: 40px;
+    width: 60px;
+    position: relative;
+    margin: 0 36px;
+}
+
+::-webkit-scrollbar {
+    width: 12px;
+  }
+  
+  /* Track */
+  ::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px grey; 
+    border-radius: 15px;
+  }
+   
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-color);
+    border-radius: 10px;
+  }
+  
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-hover);
+    transition: 0.3s;
+  }
+
+.black {
+    line-height: 40px;
+    width: 60px;
+    position: relative;
+    margin: 0 36px;
+}
+
+.move-number {
+    position:relative;
+    width:3vw;
 }
