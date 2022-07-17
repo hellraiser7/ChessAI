@@ -1,3 +1,7 @@
+let historyElement = document.getElementById('moves-list'); //select the element
+let move = 0;
+let moveCount = 0;
+ // flag to check which player's turn it is to move
 let board,
   game = new Chess();
 
@@ -32,6 +36,7 @@ function onDrop(source, target) {
    if (move === null) {
     return 'snapback';
    }
+   renderWhiteMoveHistory(game.history());
    window.setTimeout(makeBestMove, 250); //make random computer move after 250 ms
 }
 /*
@@ -180,17 +185,41 @@ let minimax2 = function (game, depth, isMaximized, alpha, beta) {
     }
 };
 
+const moves_list = document.getElementById('moves-list');
 // caller function
 function makeBestMove() {
     let isMaximized = true;
     if (game.game_over()) {
-        console.log(game.history());
-        return;
+        return
     }
-    let bestMove = minimax(game, 4, isMaximized);
+    let bestMove = minimax(game, 3, isMaximized);
     game.ugly_move(bestMove);
     //update the board
     board.position(game.fen());
+    renderBlackMoveHistory(game.history());    
+}
+
+////////////////////////// Move History Table ///////////////
+/////////////////////////////////////////////////////////////
+
+function renderWhiteMoveHistory(moves) {
+    let innerHTML;
+    let currentMove = moves.slice(-1);
+    move++;
+    innerHTML = `<div class="move" data-move-number="${move}">
+    <div class="move-number">${move}.</div>
+    <div class="white">${currentMove[0]}</div>
+    <div class="black"></div>
+    </div>`;
+    historyElement.innerHTML += innerHTML;
+}
+
+function renderBlackMoveHistory(moves) { 
+    let moveTag = Array.from(document.getElementsByClassName('move')).slice(-1)[0];
+    let blackClass = moveTag.getElementsByClassName('black')[0];
+    console.log(blackClass);
+    let currentMove = moves.slice(-1);
+    blackClass.insertAdjacentText('beforeend',`${currentMove[0]}`);
 }
 
 let config = {
