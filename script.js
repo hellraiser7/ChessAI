@@ -222,6 +222,14 @@ function renderBlackMoveHistory(moves) {
     blackClass.insertAdjacentText('beforeend',`${currentMove[0]}`);
 }
 
+function flipBoard() {
+    board.flip();
+}
+
+function resignGame() {
+    config.draggable = false;
+
+}
 let config = {
   draggable: true,
   position: "start",
@@ -229,5 +237,8 @@ let config = {
   onDrop: onDrop,
   onSnapEnd: onSnapEnd,
 };
-
+const flipBoardButton = document.getElementById('flip-board-logo');
+const resignButton = document.getElementById('resign-logo');
+flipBoardButton.addEventListener('click', flipBoard);
+resignButton.addEventListener('click', resignGame);
 board = ChessBoard("board", config);
