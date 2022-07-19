@@ -9,9 +9,11 @@
     --sidebar-color: #202020;
     --sidebar-hover-grey: #c7c2c2;
     --icons-color: 	gold;
+    --icons-hover: rgb(227, 194, 9);
     --move-history-text: rgb(84, 83, 83);
     --scrollbar-color: rgb(88, 87, 87);
     --scrollbar-hover: rgb(137, 137, 137);
+    --moves-list-color: rgb(207, 198, 198);
 }
 
 * {
@@ -199,21 +201,70 @@ body {
     position: absolute;
     top: 7%;
     left: 7%;
-    height: 77vh;
-    width: 22vw;
+    height: 70vh;
+    width: 24vw;
     overflow: auto;
 }
 
 /* Move history new appendages */
 .move {
     color: var(--sidebar-hover-grey);
-    font-size: 25px;
-    height: 45px;
+    font-size: 17px;
+    height: 30px;
     position: relative;
     width: 100%;
     display: flex;
 }
 
+.move-history-bottom-container {
+    bottom: 10px;
+    right: 15px;
+    height: 11vh;
+    width: 23vw;
+    position: absolute;
+}
+
+.resign-logo {
+    position: absolute;
+    background-color: #c7c2c2;
+    bottom: 4px;
+    left: 66px;
+    color: var(--sidebar-color);
+    font-size: 40px;
+    cursor: pointer;
+    width: 64px;
+    border-radius: 10px;
+}
+
+.resign-logo i {
+    font-size: 32px;
+    margin: 0 13px;
+}
+
+.resign-logo:hover {
+    color: var(--body-color);
+}
+
+.flip-board-logo {
+    position: absolute;
+    background-color: #c7c2c2;
+    bottom: 4px;
+    right: 5vw;
+    color: var(--sidebar-color);
+    font-size: 40px;
+    cursor: pointer;
+    width: 64px;
+    border-radius: 10px;
+}
+
+.flip-board-logo i {
+    font-size: 32px;
+    margin: 0 13px;
+}
+
+.flip-board-logo:hover {
+    color: var(--body-color);
+}
 .white {
     line-height: 40px;
     width: 60px;
