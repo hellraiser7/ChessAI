@@ -305,3 +305,157 @@ body {
     position:relative;
     width:3vw;
 }
+
+/* Keeping game scores */
+
+.game-score {
+    display: none;
+    position: absolute;
+    top: 10px;
+    left: 17vw;
+    font-family: 'Pacifico', cursive;
+    color: white;
+    font-size: 24px;
+    width: 10%;
+    height: 100vh;
+}
+
+.AI-score {
+    position: absolute;
+    bottom: 11vh;
+    left: 2vw;
+}
+
+.you-score {
+    left: 2vw;
+    position: absolute;
+}
+/* Modals for winner/stalemate */
+
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+  }
+  
+  /* Modal Content */
+  .modal-content {
+    position: relative;
+    background-color: #fefefe;
+    margin: auto;
+    padding: 0;
+    border: 1px solid #888;
+    width: 22vw;
+    height: 50vh;
+    background-color: bisque;
+    box-shadow: 0 4px 14px 0 rgb(0 0 0 / 20%), 0 11px 20px 0 rgb(0 0 0 / 32%);
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 0.4s;
+    border-radius: 10px;
+}
+
+.optional {
+    font-size: 18px;
+    color: rgb(59, 58, 58);
+    position: absolute;
+    bottom: 16%;
+    right: 4vw;
+}
+/* Add Animation */
+@-webkit-keyframes animatetop {
+    from {
+        top: -300px;
+        opacity: 0
+    }
+
+    to {
+        top: 0;
+        opacity: 1
+    }
+}
+
+@keyframes animatetop {
+    from {
+        top: -300px;
+        opacity: 0
+    }
+
+    to {
+        top: 0;
+        opacity: 1
+    }
+}
+
+/* The Close Button */
+.close {
+    color: rgb(59, 58, 58);
+    font-size: 28px;
+    font-weight: bold;
+    position: absolute;
+    right: 24px;
+    top: 4px;
+    height: 30px;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal-body {
+    font-family: 'Pacifico', cursive;
+    display: flex;
+    flex-direction: column;
+    padding: 11px 16px;
+    height: 48vh;
+}
+
+.you-ai {
+    font-size: 34px;
+    color: rgb(59, 58, 58);
+    bottom: 23vh;
+    position: absolute;
+    left: 76px;
+}
+
+.you-score {
+    font-size: 37px;
+    color: rgb(59, 58, 58);
+    position: absolute;
+    bottom: 29%;
+    width: 21px;
+    height: 50px;
+    left: 6vw;
+}
+
+.ai-score {
+    font-size: 37px;
+    color: rgb(59, 58, 58);
+    position: absolute;
+    bottom: 29%;
+    width: 21px;
+    height: 50px;
+    left: 14vw;
+}
+
+
+
+.game-over-text {
+    font-size: 34px;
+    color: rgb(59, 58, 58);
+    bottom: 34vh;
+    position: absolute;
+    left: 76px;
+}

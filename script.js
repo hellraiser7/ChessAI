@@ -1,9 +1,27 @@
 let historyElement = document.getElementById('moves-list'); //select the element
+const outcomeModal = document.getElementById('modal');
+const youScore = document.getElementById('you-score');
+const AIScore = document.getElementById('ai-score');
+const closeButtonModal = document.getElementById('close');
+const WHITE_VICTORY = "whiteVictory";
+const BLACK_VICTORY = "blackVictory";
+const STALEMATE_BY_INSUFFICIENT_MATERIAL = "Stalemate By Insufficient Material";
+const STALEMATE_BY_REPETITION = "Stalemate By Repetition";
+const optionalModalText = document.getElementById('optional');
+
+//////////////// store current state /////////////////////
+//////////////////////////////////////////////////////////
+
+let state = {
+    you: 0,
+    ai: 0
+}
 let move = 0;
 let moveCount = 0;
  // flag to check which player's turn it is to move
 let board,
   game = new Chess();
+
 
 //
 // drag only white pieces, and stop the game when either one wins, 
@@ -47,6 +65,9 @@ but we'll need to update the fen to the board in order to move the rook two plac
 */
 function onSnapEnd () {
     board.position(game.fen())
+    if (game.game_over()) {
+        console.log(game);
+    }
 }
 
 /* The AI */
@@ -190,9 +211,10 @@ const moves_list = document.getElementById('moves-list');
 function makeBestMove() {
     let isMaximized = true;
     if (game.game_over()) {
-        return
+        renderGameOutcomeWindow(game);
+        return;
     }
-    let bestMove = minimax(game, 3, isMaximized);
+    let bestMove = minimax(game, 2, isMaximized);
     game.ugly_move(bestMove);
     //update the board
     board.position(game.fen());
@@ -217,7 +239,6 @@ function renderWhiteMoveHistory(moves) {
 function renderBlackMoveHistory(moves) { 
     let moveTag = Array.from(document.getElementsByClassName('move')).slice(-1)[0];
     let blackClass = moveTag.getElementsByClassName('black')[0];
-    console.log(blackClass);
     let currentMove = moves.slice(-1);
     blackClass.insertAdjacentText('beforeend',`${currentMove[0]}`);
 }
@@ -230,6 +251,50 @@ function resignGame() {
     config.draggable = false;
 
 }
+
+/////////////////////// Render game outcome modal //////////////////
+//////////////////////////////////////////////////////////////////////
+function closeModal() {
+    outcomeModal.style.display = "none";
+}
+function setOutcomeModal(outcome) {
+    outcomeModal.style.display = "block";
+    if (outcome === WHITE_VICTORY) {
+        youScore.textContent = "1";
+        AIScore.textContent = "0";
+    }
+    else if (outcome === BLACK_VICTORY) {
+        AIScore.textContent = "1";
+        youScore.textContent = "0";
+    }
+    else {
+        youScore.textContent = "1/2";
+        AIScore.textContent = "1/2";
+        optionalModalText.textContent = `(${outcome})`;
+    }
+}
+function renderGameOutcomeWindow(game) {
+    // determine winner or whether stalemate has occurred
+    if (game.game_over()) {
+        //check for white victory: odd length of moves
+        if (game.in_checkmate() && (game.history() % 2 !== 0)) {
+            // set the text for establishing a victory for white
+            setOutcomeModal(WHITE_VICTORY);
+        } //even length of moves for black victory
+        else if (game.in_checkmate() && (game.history() % 2 === 0)) {
+            // set the text for establishing a victory for black
+            setOutcomeModal(BLACK_VICTORY);
+        } //stalemate
+        else if (game.insufficient_material()) {
+            setOutcomeModal(STALEMATE_BY_INSUFFICIENT_MATERIAL);
+        }
+        else {
+            setOutcomeModal(STALEMATE_BY_REPETITION)
+        }
+    }
+
+}
+
 let config = {
   draggable: true,
   position: "start",
@@ -237,8 +302,10 @@ let config = {
   onDrop: onDrop,
   onSnapEnd: onSnapEnd,
 };
+
 const flipBoardButton = document.getElementById('flip-board-logo');
 const resignButton = document.getElementById('resign-logo');
 flipBoardButton.addEventListener('click', flipBoard);
 resignButton.addEventListener('click', resignGame);
+closeButtonModal.addEventListener('click', closeModal);
 board = ChessBoard("board", config);

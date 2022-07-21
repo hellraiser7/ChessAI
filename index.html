@@ -25,6 +25,24 @@
                 <a href="#PGN" class="download-pgn"><i class="fa-solid fa-download"></i> Download PGN</a>
             </div>
         </div>
+        <div id="modal" class="modal">
+
+            <!-- Modal content -->
+            <div class="modal-content">
+              <div class="modal-body">
+                <span class="close" id="close">&times;</span>
+                <span class="game-over-text">Game Over!</span>
+                <span class="you-ai" id="you-ai">You  &nbsp -  &nbsp AI</span>
+                <span class="you-score" id="you-score">1</span>
+                <span class="ai-score" id="ai-score">0</span>
+                <span class="optional" id="optional"></span>
+              </div>
+            </div>         
+        </div>
+        <div class="game-score" id="game-score">
+            <span class="AI-score">AI - </span>
+            <span class="you-score">You - </span>
+        </div>
         <div id="board" class="board"></div>
         <div class="move-history-container" id="move-history-container">
             <div class="move-history-text" id="move-history-text">
@@ -33,7 +51,7 @@
             <div class="moves-list" id="moves-list">
             </div>
             <div class="move-history-bottom-container" id="move-history-bottom-container">
-                <span class="resign-logo" id="resign-logo">Resign<i class="fa-solid fa-flag"></i></span>
+                <span class="resign-logo" id="resign-logo"><i class="fa-solid fa-flag"></i></span>
                 <span class="flip-board-logo" id="flip-board-logo"><i class="fa-solid fa-chess-queen"></i></span>                
             </div>
         </div>
