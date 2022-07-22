@@ -22,12 +22,11 @@ let moveCount = 0;
 let board,
   game = new Chess();
 
-
 //
 // drag only white pieces, and stop the game when either one wins, 
 // or if stalemate occurs
 function onDragStart(source, piece, position, orientation) {
-    if (game.game_over() || (piece.search(/^b/) !== -1)) {
+    if (game.game_over() || (piece.search(/^w/) !== -1)) {
         return false;
     }
     return true;
@@ -65,9 +64,6 @@ but we'll need to update the fen to the board in order to move the rook two plac
 */
 function onSnapEnd () {
     board.position(game.fen())
-    if (game.game_over()) {
-        console.log(game);
-    }
 }
 
 /* The AI */
@@ -121,31 +117,6 @@ function getBoardEvaluation(board) {
     return totalEvaluation;
 }
 
-//find Best move after evaluating the overall board score
-// if the there are multiple moves with equal scores, then it does not matter, we randomize among those top scores
-function generateBestMove(game) {
-    let bestBoardMove = undefined;
-    let bestBoardValue = Infinity;
-    let currentBoardValue = 0;
-    let nextPossibleMove = undefined;
-    let nextBoardMoves = game.ugly_moves(); 
-    // iterate through all next possible moves, and calculate overall board score for each
-    for (let i = 0; i < nextBoardMoves.length; i++) {
-        nextPossibleMove = nextBoardMoves[i];
-        game.ugly_move(nextPossibleMove); //make the move
-        // and then check the overall board score wrt computer as black
-        currentBoardValue = getBoardEvaluation(game.board());
-        // undo the move and calculate bestmove
-        game.undo();
-        // since user plays as white, for black to have the best move, AI needs to have a negative score
-        if (currentBoardValue < bestBoardValue) {
-            bestBoardValue = currentBoardValue;
-            bestBoardMove = nextPossibleMove;
-        }
-    }
-    return bestBoardMove;
-}
-
 /* Minimax Algorithm */
 // This is the main function
 
@@ -158,7 +129,7 @@ function minimax(game, depth, isMaximized) {
         nextPossibleMove = nextBoardMoves[i]; 
         game.ugly_move(nextPossibleMove);
         // calculate the best value after recursing through all possible moves
-        let value = minimax2(game, depth-1, !isMaximized, -1000, 1000); // returns a score
+        let value = minimax2(game, depth-1, !isMaximized, 1000, -1000); // returns a score
         game.undo();
         if (value >= bestScore) {
             bestScore = value;
@@ -174,17 +145,17 @@ function minimax(game, depth, isMaximized) {
 
 let minimax2 = function (game, depth, isMaximized, alpha, beta) {
     if (!depth) {
-        return - getBoardEvaluation(game.board());
+        return getBoardEvaluation(game.board());
     }
     let nextBoardMoves = game.ugly_moves();
     if (isMaximized) {
-        let bestPossibleMove = -Infinity;
+        let bestPossibleMove = Infinity;
         for (let i = 0; i < nextBoardMoves.length; i++) {
             game.ugly_move(nextBoardMoves[i]);
-            bestPossibleMove = Math.max(bestPossibleMove, minimax2(game, depth - 1, !isMaximized, alpha, beta));
+            bestPossibleMove = Math.min(bestPossibleMove, minimax2(game, depth - 1, !isMaximized, alpha, beta));
             game.undo();
-            alpha = Math.max(alpha, bestPossibleMove);
-            if (alpha >= beta) {
+            alpha = Math.min(alpha, bestPossibleMove);
+            if (alpha <= beta) {
                 //prune the tree
                 return bestPossibleMove;
             }
@@ -192,13 +163,13 @@ let minimax2 = function (game, depth, isMaximized, alpha, beta) {
         return bestPossibleMove;
     } 
     else {
-        let bestPossibleMove = Infinity;
+        let bestPossibleMove = -Infinity;
         for (let i = 0; i < nextBoardMoves.length; i++) {
             game.ugly_move(nextBoardMoves[i]);
-            bestPossibleMove = Math.min(bestPossibleMove, minimax2(game, depth-1, !isMaximized, alpha, beta));
+            bestPossibleMove = Math.max(bestPossibleMove, minimax2(game, depth-1, !isMaximized, alpha, beta));
             game.undo();
-            beta = Math.min(beta, bestPossibleMove);
-            if (alpha >= beta) {
+            beta = Math.max(beta, bestPossibleMove);
+            if (alpha <= beta) {
                 return bestPossibleMove;
             }
         }
@@ -209,16 +180,16 @@ let minimax2 = function (game, depth, isMaximized, alpha, beta) {
 const moves_list = document.getElementById('moves-list');
 // caller function
 function makeBestMove() {
-    let isMaximized = true;
+    let isMaximized = false;
     if (game.game_over()) {
         renderGameOutcomeWindow(game);
         return;
     }
-    let bestMove = minimax(game, 2, isMaximized);
+    let bestMove = minimax(game, 3, isMaximized);
     game.ugly_move(bestMove);
     //update the board
     board.position(game.fen());
-    renderBlackMoveHistory(game.history());    
+    //renderBlackMoveHistory(game.history());    
 }
 
 ////////////////////////// Move History Table ///////////////
@@ -256,6 +227,7 @@ function resignGame() {
 //////////////////////////////////////////////////////////////////////
 function closeModal() {
     outcomeModal.style.display = "none";
+    playModal.style.display = "none";
 }
 function setOutcomeModal(outcome) {
     outcomeModal.style.display = "block";
@@ -295,17 +267,55 @@ function renderGameOutcomeWindow(game) {
 
 }
 
+
+function onDrop1(source, target) {
+    // see if the move is legal
+    let move = game.move({
+      from: source,
+      to: target,
+      promotion: "q", // NOTE: always promote to a queen for example simplicity
+    });
+        
+    if (move === null) {
+      return 'snapback';
+    }
+    //renderWhiteMoveHistory(game.history());
+    window.setTimeout(makeBestMove, 250); //make random computer move after 250 ms
+}
+
+//////////////////////// play Modal Window helpers //////////////////////////////
+const playModal = document.getElementById('play-modal');
+const colorSelectContainer = document.getElementById('color-select');
+const button1 = document.getElementById('button1');
+const button2 = document.getElementById('button2');
+const closePlayModalButton = document.getElementById('play-close');
+colorSelectContainer.addEventListener('click', setBackgroundColor);
+
+function setBackgroundColor(e) {
+    let button = e.target.closest('button');
+    if (button.classList.contains('button1')) {
+        button.style['background-color'] = '#3CB371'; //seagreen 
+        button2.style.backgroundColor = '#363535'; //default
+    }
+    else if (button.classList.contains('button2')) {
+        button.style.backgroundColor = '#3CB371';
+        button1.style.backgroundColor = '#363535'; //default
+    }
+}
 let config = {
   draggable: true,
   position: "start",
   onDragStart: onDragStart,
-  onDrop: onDrop,
+  onDrop: onDrop1,
   onSnapEnd: onSnapEnd,
 };
-
+window.setTimeout(makeBestMove, 250);
+window.addEventListener('load', flipBoard);
 const flipBoardButton = document.getElementById('flip-board-logo');
 const resignButton = document.getElementById('resign-logo');
 flipBoardButton.addEventListener('click', flipBoard);
 resignButton.addEventListener('click', resignGame);
 closeButtonModal.addEventListener('click', closeModal);
+closePlayModalButton.addEventListener('click', closeModal);
+
 board = ChessBoard("board", config);

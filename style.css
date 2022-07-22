@@ -450,12 +450,103 @@ body {
     left: 14vw;
 }
 
-
-
 .game-over-text {
     font-size: 34px;
     color: rgb(59, 58, 58);
     bottom: 34vh;
     position: absolute;
     left: 76px;
+}
+
+/* Modal for playing */
+
+.play-modal {
+    display: block;
+    /* Hidden by default */
+    position: fixed;
+    /* Stay in place */
+    z-index: 1;
+    /* Sit on top */
+    padding-top: 100px;
+    /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%;
+    /* Full width */
+    height: 100%;
+    /* Full height */
+    overflow: auto;
+    /* Enable scroll if needed */
+    background-color: rgb(0, 0, 0);
+    /* Fallback color */
+    background-color: rgba(0, 0, 0, 0.4);
+    /* Black w/ opacity */
+}
+
+/* Modal Content */
+.play-modal-content {
+    position: relative;
+    background-color: #fefefe;
+    margin: auto;
+    padding: 0;
+    border: 1px solid #888;
+    width: 22vw;
+    height: 50vh;
+    background-color: bisque;
+    box-shadow: 0 4px 14px 0 rgb(0 0 0 / 20%), 0 11px 20px 0 rgb(0 0 0 / 32%);
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 0.4s;
+    border-radius: 10px;
+}
+/* play-modal close button */
+.play-close {
+    color: rgb(59, 58, 58);
+    font-size: 28px;
+    font-weight: bold;
+    position: absolute;
+    right: 24px;
+    top: 4px;
+    height: 30px;
+}
+
+.play-close:hover,
+.play-close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.color-select {
+    color: var(--sidebar-color);
+    font-family: 'Pacifico', cursive;
+    bottom: 34vh;
+    position: absolute;
+    font-size: 40px;
+    left: 54px;
+}
+
+.color-select-buttons {
+    bottom: 23vh;
+    position: absolute;
+    left: 42px;
+}
+
+.button {
+    background-color: var(--body-color);
+    color: white;
+    padding: 12px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 24px;
+    margin: 0px 15px;
+    cursor: pointer;
+    border-radius: 10px;
+}
+
+.button:hover {
+    background-color: var(--sidebar-color);
+    transition: 400ms;
 }

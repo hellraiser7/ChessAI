@@ -39,6 +39,20 @@
               </div>
             </div>         
         </div>
+        <div id="play-modal" class="play-modal">
+            <!-- Modal content -->
+            <div class="play-modal-content">
+                <div class="play-modal-body">
+                    <span class="play-close" id="play-close">&times;</span>
+                    <span class="color-select">Select Color</span>
+                    <div class="color-select-buttons" id="color-select">
+                        <button class="button button1" id="button1">White</button>
+                        <button class="button button2" id="button2">Black</button>
+                    </div>
+                    <span class="depth" id="depth"></span>
+                </div>
+            </div>
+        </div>
         <div class="game-score" id="game-score">
             <span class="AI-score">AI - </span>
             <span class="you-score">You - </span>
@@ -56,29 +70,6 @@
             </div>
         </div>
     </div>
-    <!--
-<div class="info">
-    Search depth:
-    <select id="search-depth">
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3" selected>3</option>
-        <option value="4">4</option>
-        <option value="5">5</option>
-    </select>
-
-    <br>
-    <span>Positions evaluated: <span id="position-count"></span></span>
-    <br>
-    <span>Time: <span id="time"></span></span>
-    <br>
-    <span>Positions/s: <span id="positions-per-s"></span> </span>
-    <br>
-    <br>
-    <div id="move-history" class="move-history">
-    </div>
-</div>
--->
     <script src="lib/jquery/jquery-3.2.1.min.js"></script>
     <script src="lib/chessboardjs/js/chess.js"></script>
     <script src="lib/chessboardjs/js/chessboard-0.3.0.js"></script>
