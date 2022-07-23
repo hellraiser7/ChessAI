@@ -19,10 +19,10 @@
                 <span class="close-button" id="close-button">×</span>
             </div>
             <div class="links">
-                <a href="#Play" class="Play"><i class="fa-solid fa-chess"></i> Play</a>
-                <a href="#About" class="About"><i class="fa-solid fa-chess-board"></i> About</a>
-                <a href="#Settings" class="Settings"><i class="fa-solid fa-gear"></i> Settings</a>
-                <a href="#PGN" class="download-pgn"><i class="fa-solid fa-download"></i> Download PGN</a>
+                <a href="#Play" class="Play" id="Play"><i class="fa-solid fa-chess"></i> Play</a>
+                <a href="#About" class="About" id="About"><i class="fa-solid fa-chess-board"></i> About</a>
+                <a href="#Settings" class="Settings" id="Settings"><i class="fa-solid fa-gear"></i> Settings</a>
+                <a href="#PGN" class="download-pgn" id="download-pgn"><i class="fa-solid fa-download"></i> Download PGN</a>
             </div>
         </div>
         <div id="modal" class="modal">
@@ -49,7 +49,16 @@
                         <button class="button button1" id="button1">White</button>
                         <button class="button button2" id="button2">Black</button>
                     </div>
-                    <span class="depth" id="depth"></span>
+                    <span class="depth" id="depth">Select Depth</span>
+                    <div class="depth-btns" id="depth-select">
+                        <button class="depth-button depth-1" id="depth-1">1</button>
+                        <button class="depth-button depth-2" id="depth-2">2</button>
+                        <button class="depth-button depth-3" id="depth-3">3</button>
+                        <button class="depth-button depth-4" id="depth-4">4</button>
+                    </div>
+                    <div class="new-game" id="new-game">
+                        <button class="new-game-btn" id="new-game-btn">New Game</button>
+                    </div>
                 </div>
             </div>
         </div>

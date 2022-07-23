@@ -461,7 +461,7 @@ body {
 /* Modal for playing */
 
 .play-modal {
-    display: block;
+    display: none;
     /* Hidden by default */
     position: fixed;
     /* Stay in place */
@@ -491,7 +491,7 @@ body {
     padding: 0;
     border: 1px solid #888;
     width: 22vw;
-    height: 50vh;
+    height: 58vh;
     background-color: bisque;
     box-shadow: 0 4px 14px 0 rgb(0 0 0 / 20%), 0 11px 20px 0 rgb(0 0 0 / 32%);
     -webkit-animation-name: animatetop;
@@ -521,14 +521,14 @@ body {
 .color-select {
     color: var(--sidebar-color);
     font-family: 'Pacifico', cursive;
-    bottom: 34vh;
+    bottom: 45vh;
     position: absolute;
     font-size: 40px;
     left: 54px;
 }
 
 .color-select-buttons {
-    bottom: 23vh;
+    bottom: 37vh;
     position: absolute;
     left: 42px;
 }
@@ -546,7 +546,58 @@ body {
     border-radius: 10px;
 }
 
-.button:hover {
+.depth-button {
+    background-color: var(--body-color);
+    color: white;
+    padding: 12px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 24px;
+    margin: 0px 15px;
+    cursor: pointer;
+    border-radius: 10px;
+}
+
+.button:hover,
+.depth-button:hover,
+.new-game-btn:hover {
     background-color: var(--sidebar-color);
     transition: 400ms;
+}
+
+.depth-btns {
+    bottom: 17vh;
+    position: absolute;
+    left: 20px;
+}
+
+.depth {
+    color: var(--sidebar-color);
+    font-family: 'Pacifico', cursive;
+    bottom: 25vh;
+    position: absolute;
+    font-size: 40px;
+    left: 54px;
+}
+
+/* New Game button inside playModal */
+
+.new-game {
+    bottom: 10px;
+    position: absolute;
+    left: 74px;
+}
+
+.new-game-btn {
+    background-color: var(--body-color);
+    color: white;
+    padding: 12px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 24px;
+    margin: 0px 15px;
+    cursor: pointer;
+    border-radius: 10px;
 }

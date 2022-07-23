@@ -14,7 +14,10 @@ const optionalModalText = document.getElementById('optional');
 
 let state = {
     you: 0,
-    ai: 0
+    ai: 0,
+    color: null,
+    depth: 0,
+    supportedDepths: [1,2,3,4]
 }
 let move = 0;
 let moveCount = 0;
@@ -26,7 +29,14 @@ let board,
 // drag only white pieces, and stop the game when either one wins, 
 // or if stalemate occurs
 function onDragStart(source, piece, position, orientation) {
-    if (game.game_over() || (piece.search(/^w/) !== -1)) {
+    let isAIPieceStrengthZero;
+    if (state.color === "white") {
+        isAIPieceStrengthZero = (piece.search(/^b/) !== -1);
+    }
+    else {
+        isAIPieceStrengthZero = (piece.search(/^w/) !== -1)
+    }
+    if (game.game_over() || isAIPieceStrengthZero) {
         return false;
     }
     return true;
@@ -53,7 +63,7 @@ function onDrop(source, target) {
    if (move === null) {
     return 'snapback';
    }
-   renderWhiteMoveHistory(game.history());
+   //renderWhiteMoveHistory(game.history());
    window.setTimeout(makeBestMove, 250); //make random computer move after 250 ms
 }
 /*
@@ -182,10 +192,10 @@ const moves_list = document.getElementById('moves-list');
 function makeBestMove() {
     let isMaximized = false;
     if (game.game_over()) {
-        renderGameOutcomeWindow(game);
+        //renderGameOutcomeWindow(game);
         return;
     }
-    let bestMove = minimax(game, 3, isMaximized);
+    let bestMove = minimax(game, state.depth, isMaximized);
     game.ugly_move(bestMove);
     //update the board
     board.position(game.fen());
@@ -215,7 +225,6 @@ function renderBlackMoveHistory(moves) {
 }
 
 function flipBoard() {
-    board.flip();
 }
 
 function resignGame() {
@@ -227,8 +236,48 @@ function resignGame() {
 //////////////////////////////////////////////////////////////////////
 function closeModal() {
     outcomeModal.style.display = "none";
+}
+
+// close the playModal if newgame is pressed or close-btn, but check if the user has selected all the fields prior
+// 1. If new-game btn is clicked and fields are selected, create a new game with the selected ones
+// 2. If new-game btn clicked and fields are not selected, generate a new game with random choices of depth and color
+// 3. If close-btn pressed, don't do anything, just close the modal.
+function closePlayModal() {
+        // check the state and start a new game depending on those states
+    if (state.color === null && state.depth === 0) {
+        //random game
+        generateRandomGame();
+    }
+    else {
+        createNewGame();
+    }
     playModal.style.display = "none";
 }
+
+//////////////////////////// generate Random Game //////////////////////////
+////////////////////////////////////////////////////////////////////////////
+function randomIntFromInterval(min, max) { // min and max included 
+    return Math.floor(Math.random() * (max - min + 1) + min)
+}
+
+function generateRandomGame() {
+    let randomDepth = randomIntFromInterval(1,state.supportedDepths.length);
+    let randomColor = randomIntFromInterval(1,2); //only two colors obviously
+    // set the state
+    state.color = (randomColor === 1) ? "white" : "black";
+    state.depth = randomDepth; 
+    // now generate the random game from these states
+    createNewGame();
+}
+
+function createNewGame() {
+    board = ChessBoard('board', config);
+    if (state.color === "black") {
+        //flip and let AI start first
+        board.flip();
+        makeBestMove();
+    }
+} 
 function setOutcomeModal(outcome) {
     outcomeModal.style.display = "block";
     if (outcome === WHITE_VICTORY) {
@@ -288,34 +337,69 @@ const playModal = document.getElementById('play-modal');
 const colorSelectContainer = document.getElementById('color-select');
 const button1 = document.getElementById('button1');
 const button2 = document.getElementById('button2');
+const depthBtns = document.getElementsByClassName('depth-button');
 const closePlayModalButton = document.getElementById('play-close');
-colorSelectContainer.addEventListener('click', setBackgroundColor);
+const playGame = document.getElementById('Play');
+const aboutGame = document.getElementById('About');
+const downloadPGN = document.getElementById('download-pgn');
+const flipBoardButton = document.getElementById('flip-board-logo');
+const resignButton = document.getElementById('resign-logo');
+const depthSelectContainer = document.getElementById('depth-select');
+const newGameButton = document.getElementById('new-game');
 
+function setDepthDefaults() {
+    for (let i = 0; i < depthBtns.length; i++) {
+        depthBtns[i].style.backgroundColor = '#363535';
+    }
+}
 function setBackgroundColor(e) {
-    let button = e.target.closest('button');
-    if (button.classList.contains('button1')) {
-        button.style['background-color'] = '#3CB371'; //seagreen 
-        button2.style.backgroundColor = '#363535'; //default
+  let button = e.target.closest("button");
+  try {
+    if (button.classList.contains("button1")) {
+      button.style["background-color"] = "#3CB371"; //seagreen
+      button2.style.backgroundColor = "#363535"; //default
+      state.color = "white";
+    } else if (button.classList.contains("button2")) {
+      button.style.backgroundColor = "#3CB371";
+      button1.style.backgroundColor = "#363535"; //default
+      state.color = "black";
+    } else if (
+      button.classList.contains("depth-1") ||
+      button.classList.contains("depth-2") ||
+      button.classList.contains("depth-3") ||
+      button.classList.contains("depth-4")
+    ) {
+      setDepthDefaults(); //first set default grey to all depth buttons
+      button.style.backgroundColor = "#3CB371"; //then set the seagreen
+      state.depth = button.textContent;
     }
-    else if (button.classList.contains('button2')) {
-        button.style.backgroundColor = '#3CB371';
-        button1.style.backgroundColor = '#363535'; //default
-    }
+  } catch (error) {
+    return;
+  }
+}
+
+function renderPlayModal() {
+    playModal.style.display = "block";
+}
+
+function clearBoard() {
+    board = ChessBoard('board');
 }
 let config = {
   draggable: true,
   position: "start",
   onDragStart: onDragStart,
-  onDrop: onDrop1,
+  onDrop: onDrop,
   onSnapEnd: onSnapEnd,
 };
-window.setTimeout(makeBestMove, 250);
-window.addEventListener('load', flipBoard);
-const flipBoardButton = document.getElementById('flip-board-logo');
-const resignButton = document.getElementById('resign-logo');
+// flip the board for black //
+/////////////////////////////
+window.addEventListener('load', clearBoard);
+depthSelectContainer.addEventListener('click', setBackgroundColor);
+colorSelectContainer.addEventListener('click', setBackgroundColor);
 flipBoardButton.addEventListener('click', flipBoard);
 resignButton.addEventListener('click', resignGame);
 closeButtonModal.addEventListener('click', closeModal);
-closePlayModalButton.addEventListener('click', closeModal);
-
-board = ChessBoard("board", config);
+closePlayModalButton.addEventListener('click', closePlayModal);
+newGameButton.addEventListener('click', closePlayModal);
+playGame.addEventListener('click', renderPlayModal);
