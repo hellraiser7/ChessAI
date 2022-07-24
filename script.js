@@ -17,7 +17,11 @@ let state = {
     ai: 0,
     color: null,
     depth: 0,
-    supportedDepths: [1,2,3,4]
+    supportedDepths: [1,2,3,4],
+    gameInProgress: false,
+    alpha: -1000,
+    beta: 1000,
+    bestPossibleMove: null
 }
 let move = 0;
 let moveCount = 0;
@@ -28,15 +32,16 @@ let board,
 //
 // drag only white pieces, and stop the game when either one wins, 
 // or if stalemate occurs
+
+function getAIPieceStrength(PlayerColor, piece) {
+    if (PlayerColor === "white") {
+        return (piece.search(/^b/) !== -1);
+    }
+    return (piece.search(/^w/) !== -1);
+}
 function onDragStart(source, piece, position, orientation) {
-    let isAIPieceStrengthZero;
-    if (state.color === "white") {
-        isAIPieceStrengthZero = (piece.search(/^b/) !== -1);
-    }
-    else {
-        isAIPieceStrengthZero = (piece.search(/^w/) !== -1)
-    }
-    if (game.game_over() || isAIPieceStrengthZero) {
+    let isAIPieceStrengthZero = getAIPieceStrength(state.color, piece);
+    if (game.game_over()) {
         return false;
     }
     return true;
@@ -130,16 +135,16 @@ function getBoardEvaluation(board) {
 /* Minimax Algorithm */
 // This is the main function
 
-function minimax(game, depth, isMaximized) {
+function minimax(game, depth, isMaximized, alpha, beta) {
     let nextBoardMoves = game.ugly_moves();
     let nextPossibleMove = undefined;
-    let bestScore = -Infinity;
+    let bestScore = - Infinity;
     let bestMovePossible = undefined;
     for (let i = 0; i < nextBoardMoves.length; i++) {
         nextPossibleMove = nextBoardMoves[i]; 
         game.ugly_move(nextPossibleMove);
         // calculate the best value after recursing through all possible moves
-        let value = minimax2(game, depth-1, !isMaximized, 1000, -1000); // returns a score
+        let value = minimax2(game, depth-1, !isMaximized, alpha, beta); // returns a score
         game.undo();
         if (value >= bestScore) {
             bestScore = value;
@@ -153,35 +158,56 @@ function minimax(game, depth, isMaximized) {
 /////////////////// Helper Functions for recursive call /////////////////
 /////////////////////////////////////////////////////////////////////////
 
-let minimax2 = function (game, depth, isMaximized, alpha, beta) {
+function minimax2(game, depth, isMaximized, alpha, beta) {
     if (!depth) {
-        return getBoardEvaluation(game.board());
+        return (state.color === "white") ? - getBoardEvaluation(game.board()) : getBoardEvaluation(game.board());
     }
     let nextBoardMoves = game.ugly_moves();
     if (isMaximized) {
-        let bestPossibleMove = Infinity;
+        let bestPossibleMove = (state.color === "white") ? - Infinity : Infinity;
         for (let i = 0; i < nextBoardMoves.length; i++) {
             game.ugly_move(nextBoardMoves[i]);
-            bestPossibleMove = Math.min(bestPossibleMove, minimax2(game, depth - 1, !isMaximized, alpha, beta));
-            game.undo();
-            alpha = Math.min(alpha, bestPossibleMove);
-            if (alpha <= beta) {
-                //prune the tree
-                return bestPossibleMove;
+            if (state.color === "white") {
+                bestPossibleMove = Math.max(bestPossibleMove, minimax2(game, depth - 1, !isMaximized, alpha, beta));
+                alpha = Math.max(alpha, bestPossibleMove);
+                if (alpha >= beta) {
+                    // prune the tree
+                    return bestPossibleMove;
+                }          
             }
+            else {
+                bestPossibleMove = Math.min(bestPossibleMove, minimax2(game, depth - 1, !isMaximized, alpha, beta));
+                alpha = Math.min(alpha, bestPossibleMove);
+                if (alpha <= beta) {
+                    // prune the tree
+                    return bestPossibleMove;
+                }
+            }
+            game.undo();
         }
         return bestPossibleMove;
     } 
     else {
-        let bestPossibleMove = -Infinity;
+        let bestPossibleMove = (state.color === "white") ? Infinity : - Infinity;
         for (let i = 0; i < nextBoardMoves.length; i++) {
             game.ugly_move(nextBoardMoves[i]);
-            bestPossibleMove = Math.max(bestPossibleMove, minimax2(game, depth-1, !isMaximized, alpha, beta));
-            game.undo();
-            beta = Math.max(beta, bestPossibleMove);
-            if (alpha <= beta) {
-                return bestPossibleMove;
+            if (state.color === "white") {
+                bestPossibleMove = Math.min(bestPossibleMove, minimax2(game, depth - 1, !isMaximized, alpha, beta));
+                alpha = Math.min(alpha, bestPossibleMove);
+                if (alpha >= beta) {
+                    // prune the tree
+                    return bestPossibleMove;
+                }          
             }
+            else {
+                bestPossibleMove = Math.max(bestPossibleMove, minimax2(game, depth - 1, !isMaximized, alpha, beta));
+                alpha = Math.max(alpha, bestPossibleMove);
+                if (alpha <= beta) {
+                    // prune the tree
+                    return bestPossibleMove;
+                }
+            }
+            game.undo();
         }
         return bestPossibleMove;
     }
@@ -190,12 +216,12 @@ let minimax2 = function (game, depth, isMaximized, alpha, beta) {
 const moves_list = document.getElementById('moves-list');
 // caller function
 function makeBestMove() {
-    let isMaximized = false;
+    let isMaximized = (state.color === "white");
     if (game.game_over()) {
         //renderGameOutcomeWindow(game);
         return;
     }
-    let bestMove = minimax(game, state.depth, isMaximized);
+    let bestMove = minimax(game, state.depth, isMaximized, state.alpha, state.beta);
     game.ugly_move(bestMove);
     //update the board
     board.position(game.fen());
@@ -225,6 +251,7 @@ function renderBlackMoveHistory(moves) {
 }
 
 function flipBoard() {
+    board.flip();
 }
 
 function resignGame() {
@@ -240,40 +267,28 @@ function closeModal() {
 
 // close the playModal if newgame is pressed or close-btn, but check if the user has selected all the fields prior
 // 1. If new-game btn is clicked and fields are selected, create a new game with the selected ones
-// 2. If new-game btn clicked and fields are not selected, generate a new game with random choices of depth and color
+// 2. If new-game btn clicked and fields are not selected, generate an alert 
 // 3. If close-btn pressed, don't do anything, just close the modal.
-function closePlayModal() {
+function closePlayModal(e) {
         // check the state and start a new game depending on those states
-    if (state.color === null && state.depth === 0) {
-        //random game
-        generateRandomGame();
+    if (e.target.classList.contains('new-game-btn') && state.color && state.depth) {
+        createNewGame();
+        playModal.style.display = "none";
+    }
+    else if (e.target.classList.contains('play-close')) {
+        playModal.style.display = "none";
     }
     else {
-        createNewGame();
+        alert("Please select all fields!");
     }
-    playModal.style.display = "none";
-}
-
-//////////////////////////// generate Random Game //////////////////////////
-////////////////////////////////////////////////////////////////////////////
-function randomIntFromInterval(min, max) { // min and max included 
-    return Math.floor(Math.random() * (max - min + 1) + min)
-}
-
-function generateRandomGame() {
-    let randomDepth = randomIntFromInterval(1,state.supportedDepths.length);
-    let randomColor = randomIntFromInterval(1,2); //only two colors obviously
-    // set the state
-    state.color = (randomColor === 1) ? "white" : "black";
-    state.depth = randomDepth; 
-    // now generate the random game from these states
-    createNewGame();
 }
 
 function createNewGame() {
     board = ChessBoard('board', config);
+    console.log(state);
     if (state.color === "black") {
         //flip and let AI start first
+        [state.alpha, state.beta] = [state.beta, state.alpha];
         board.flip();
         makeBestMove();
     }
@@ -371,7 +386,7 @@ function setBackgroundColor(e) {
     ) {
       setDepthDefaults(); //first set default grey to all depth buttons
       button.style.backgroundColor = "#3CB371"; //then set the seagreen
-      state.depth = button.textContent;
+      state.depth = Number(button.textContent);
     }
   } catch (error) {
     return;
